@@ -20,20 +20,21 @@ export default async function MainLayout({
   return (
     <div className="min-h-screen bg-slate-100">
       <nav className="bg-[#1e3a5f] text-white">
-        <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-14">
-          <div className="flex items-center gap-6">
-            <span className="font-bold text-sm">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 flex items-center justify-between h-14 gap-2">
+          <div className="flex items-center gap-3 sm:gap-6 min-w-0">
+            <span className="font-bold text-sm whitespace-nowrap hidden sm:inline">
               Hồ sơ Chuyển mục đích – Xã Tân Thới
             </span>
-            <Link href="/ho-so" className="text-sm text-slate-200 hover:text-white">
+            <span className="font-bold text-sm whitespace-nowrap sm:hidden">CMĐ Tân Thới</span>
+            <Link href="/ho-so" className="text-sm text-slate-200 hover:text-white whitespace-nowrap">
               Danh sách
             </Link>
-            <Link href="/dashboard" className="text-sm text-slate-200 hover:text-white">
+            <Link href="/dashboard" className="text-sm text-slate-200 hover:text-white whitespace-nowrap">
               Dashboard
             </Link>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-xs text-slate-300">{user.email}</span>
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+            <span className="text-xs text-slate-300 hidden sm:inline">{user.email}</span>
             <LogoutButton />
           </div>
         </div>

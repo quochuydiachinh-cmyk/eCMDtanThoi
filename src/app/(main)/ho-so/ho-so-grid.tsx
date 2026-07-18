@@ -16,8 +16,24 @@ import { CustomFieldDef, HoSo, TRANG_THAI_LABEL, TrangThai } from "@/lib/types";
 import { tinhTrangThai } from "@/lib/status";
 import { formatDateDisplay, parseDateInput } from "@/lib/dates";
 import AddColumnDialog from "./add-column-dialog";
+import MobileCardList from "./mobile-card-list";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
+
+const gridTheme = themeQuartz.withParams({
+  accentColor: "#2563eb",
+  headerBackgroundColor: "#1e3a5f",
+  headerTextColor: "#ffffff",
+  headerFontWeight: 600,
+  oddRowBackgroundColor: "#f8fafc",
+  rowHoverColor: "#eff6ff",
+  borderColor: "#e2e8f0",
+  wrapperBorder: true,
+  rowBorder: true,
+  columnBorder: true,
+  cellHorizontalPadding: 10,
+  fontSize: 13,
+});
 
 const YEARS = [2026, 2025];
 
@@ -193,6 +209,39 @@ export default function HoSoGrid() {
       return;
     }
     setRows((prev) => prev.filter((r) => r.id !== row.id));
+  }, []);
+
+  const handleUpdateRow = useCallback(async (updated: HoSo) => {
+    const supabase = createClient();
+    const payload = {
+      stt: updated.stt,
+      ho_ten: updated.ho_ten,
+      dia_chi_noi_o: updated.dia_chi_noi_o,
+      ap: updated.ap,
+      dia_chi_thua_dat: updated.dia_chi_thua_dat,
+      to_ban_do: updated.to_ban_do,
+      thua_dat_truoc: updated.thua_dat_truoc,
+      loai_dat_truoc: updated.loai_dat_truoc,
+      dien_tich_truoc: updated.dien_tich_truoc,
+      thua_dat_sau: updated.thua_dat_sau,
+      dien_tich_sau_cln: updated.dien_tich_sau_cln,
+      dien_tich_sau_ont: updated.dien_tich_sau_ont,
+      dien_tich_sau_nts: updated.dien_tich_sau_nts,
+      ngay_nhan: updated.ngay_nhan,
+      ngay_tra: updated.ngay_tra,
+      ghi_chu: updated.ghi_chu,
+      gcn_so_seri: updated.gcn_so_seri,
+      gcn_so_giay: updated.gcn_so_giay,
+      so_dien_thoai: updated.so_dien_thoai,
+      custom_fields: updated.custom_fields,
+    };
+    const { error } = await supabase.from("ho_so").update(payload).eq("id", updated.id);
+    if (error) {
+      alert("Lưu thất bại: " + error.message);
+      return false;
+    }
+    setRows((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+    return true;
   }, []);
 
   const handleExport = useCallback(() => {
@@ -386,8 +435,8 @@ export default function HoSoGrid() {
   }, [customFields, handleDeleteRow]);
 
   return (
-    <div className="max-w-[1600px] mx-auto p-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="max-w-[1600px] mx-auto p-3 sm:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
         <div className="flex gap-1">
           {YEARS.map((y) => (
             <button
@@ -403,7 +452,7 @@ export default function HoSoGrid() {
             </button>
           ))}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={handleAddRow}
             className="text-xs font-semibold px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white"
@@ -439,7 +488,7 @@ export default function HoSoGrid() {
       </div>
 
       <div className="bg-white rounded-xl shadow p-4 mb-4">
-        <div className="grid grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           <div>
             <label className="block text-[11px] font-medium text-slate-500 mb-1">Ấp</label>
             <select
@@ -512,13 +561,14 @@ export default function HoSoGrid() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow p-2">
-        <p className="text-xs text-slate-500 px-2 pb-2">
-          {loading ? "Đang tải..." : `${filteredRows.length} / ${rows.length} hồ sơ`}
-        </p>
+      <p className="text-xs text-slate-500 px-1 pb-2">
+        {loading ? "Đang tải..." : `${filteredRows.length} / ${rows.length} hồ sơ`}
+      </p>
+
+      <div className="hidden md:block bg-white rounded-xl shadow p-2">
         <div style={{ height: "calc(100vh - 340px)", minHeight: 400 }}>
           <AgGridReact<HoSo>
-            theme={themeQuartz}
+            theme={gridTheme}
             rowData={filteredRows}
             columnDefs={columnDefs}
             defaultColDef={{ resizable: true, sortable: true, filter: true }}
@@ -529,6 +579,15 @@ export default function HoSoGrid() {
             stopEditingWhenCellsLoseFocus
           />
         </div>
+      </div>
+
+      <div className="md:hidden">
+        <MobileCardList
+          rows={filteredRows}
+          customFields={customFields}
+          onSave={handleUpdateRow}
+          onDelete={handleDeleteRow}
+        />
       </div>
 
       <AddColumnDialog

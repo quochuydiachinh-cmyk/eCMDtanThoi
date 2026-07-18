@@ -180,7 +180,7 @@ export default function DashboardClient() {
   }, [filteredRows]);
 
   return (
-    <div className="max-w-[1600px] mx-auto p-6">
+    <div className="max-w-[1600px] mx-auto p-3 sm:p-6">
       <div className="mb-4">
         <h1 className="text-lg font-bold text-[#1e3a5f]">
           📊 Dashboard Chuyển mục đích sử dụng đất – Xã Tân Thới
@@ -190,7 +190,7 @@ export default function DashboardClient() {
         </p>
       </div>
 
-      <div className="grid grid-cols-4 gap-3.5 mb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mb-4">
         <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
           <div className="text-[11px] text-slate-500 uppercase tracking-wide">Tổng hồ sơ</div>
           <div className="text-2xl font-bold text-blue-600 mt-1">{cards.total}</div>
@@ -217,7 +217,7 @@ export default function DashboardClient() {
 
       <div className="bg-white rounded-lg shadow p-4 mb-4">
         <div className="text-xs font-semibold text-[#1e3a5f] mb-3">🔍 Bộ lọc</div>
-        <div className="grid grid-cols-4 lg:grid-cols-7 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
           <FilterSelect
             label="Năm"
             value={String(filters.nam)}
@@ -283,7 +283,7 @@ export default function DashboardClient() {
         </div>
       </div>
 
-      <div className="grid grid-cols-[1.6fr_1fr] gap-3.5 mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-3.5 mb-4">
         <ChartBox title="Diện tích chuyển mục đích theo thời gian (m²)">
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={timeChartData}>
@@ -313,7 +313,7 @@ export default function DashboardClient() {
         </ChartBox>
       </div>
 
-      <div className="grid grid-cols-2 gap-3.5 mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 mb-4">
         <ChartBox title="Diện tích trước CMĐ theo ấp (m²)">
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={apChartData} layout="vertical" margin={{ left: 24 }}>
