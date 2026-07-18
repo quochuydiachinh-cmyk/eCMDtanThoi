@@ -1,3 +1,14 @@
+const VN_WEEKDAY = ["Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy"];
+
+/** Định dạng ngày kiểu "Thứ bảy, 18/07/2026" */
+export function formatVietnameseDate(date: Date): string {
+  const weekday = VN_WEEKDAY[date.getDay()];
+  const d = String(date.getDate()).padStart(2, "0");
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const y = date.getFullYear();
+  return `${weekday}, ${d}/${m}/${y}`;
+}
+
 /** Chuyển ISO "YYYY-MM-DD" -> hiển thị "dd/mm/yyyy" */
 export function formatDateDisplay(iso: string | null | undefined): string {
   if (!iso) return "";
