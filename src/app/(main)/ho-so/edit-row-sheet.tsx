@@ -19,12 +19,14 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 export default function EditRowSheet({
   row,
   customFields,
+  canEdit,
   onClose,
   onSave,
   onDelete,
 }: {
   row: HoSo;
   customFields: CustomFieldDef[];
+  canEdit: boolean;
   onClose: () => void;
   onSave: (row: HoSo) => Promise<boolean>;
   onDelete: (row: HoSo) => void;
@@ -62,7 +64,7 @@ export default function EditRowSheet({
           {TRANG_THAI_LABEL[trangThai]}
         </span>
 
-        <div className="space-y-3">
+        <fieldset disabled={!canEdit} className="space-y-3">
           <Field label="Họ và tên">
             <input className={inputCls} value={form.ho_ten ?? ""} onChange={(e) => setField("ho_ten", e.target.value)} />
           </Field>
@@ -210,30 +212,41 @@ export default function EditRowSheet({
               />
             </Field>
           ))}
-        </div>
+        </fieldset>
 
         <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
-          <button
-            onClick={() => {
-              onDelete(form);
-              onClose();
-            }}
-            className="text-xs font-semibold text-red-600 hover:text-red-700"
-          >
-            Xoá hồ sơ
-          </button>
-          <div className="flex gap-2">
-            <button onClick={onClose} className="text-sm px-4 py-2 rounded-md text-slate-600 hover:bg-slate-100">
-              Huỷ
-            </button>
+          {canEdit ? (
+            <>
+              <button
+                onClick={() => {
+                  onDelete(form);
+                  onClose();
+                }}
+                className="text-xs font-semibold text-red-600 hover:text-red-700"
+              >
+                Xoá hồ sơ
+              </button>
+              <div className="flex gap-2">
+                <button onClick={onClose} className="text-sm px-4 py-2 rounded-md text-slate-600 hover:bg-slate-100">
+                  Huỷ
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="text-sm px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold"
+                >
+                  {saving ? "Đang lưu..." : "Lưu"}
+                </button>
+              </div>
+            </>
+          ) : (
             <button
-              onClick={handleSave}
-              disabled={saving}
-              className="text-sm px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold"
+              onClick={onClose}
+              className="ml-auto text-sm px-4 py-2 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold"
             >
-              {saving ? "Đang lưu..." : "Lưu"}
+              Đóng
             </button>
-          </div>
+          )}
         </div>
       </div>
     </div>

@@ -9,9 +9,10 @@ const SUPABASE_SECRET_KEY = process.env.SUPABASE_SECRET_KEY!;
 
 const email = process.argv[2];
 const password = process.argv[3];
+const role = (process.argv[4] ?? "admin") as "admin" | "editor" | "viewer";
 
-if (!email || !password) {
-  console.error("Cách dùng: npx tsx scripts/create-user.ts <email> <mật khẩu>");
+if (!email || !password || !["admin", "editor", "viewer"].includes(role)) {
+  console.error("Cách dùng: npx tsx scripts/create-user.ts <email> <mật khẩu> [admin|editor|viewer]");
   process.exit(1);
 }
 
@@ -25,11 +26,20 @@ async function main() {
     password,
     email_confirm: true,
   });
-  if (error) {
-    console.error("Tạo tài khoản thất bại:", error.message);
+  if (error || !data.user) {
+    console.error("Tạo tài khoản thất bại:", error?.message);
     process.exit(1);
   }
-  console.log(`Đã tạo tài khoản: ${data.user?.email} (id: ${data.user?.id})`);
+
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .insert({ id: data.user.id, email, role });
+  if (profileError) {
+    console.error("Tạo profile thất bại:", profileError.message);
+    process.exit(1);
+  }
+
+  console.log(`Đã tạo tài khoản: ${data.user.email} (id: ${data.user.id}, quyền: ${role})`);
 }
 
 main();

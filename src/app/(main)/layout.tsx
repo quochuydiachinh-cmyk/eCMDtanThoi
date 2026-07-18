@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentUserRole } from "@/lib/get-role";
 import LogoutButton from "./logout-button";
 
 export default async function MainLayout({
@@ -17,6 +18,8 @@ export default async function MainLayout({
     redirect("/login");
   }
 
+  const role = await getCurrentUserRole();
+
   return (
     <div className="min-h-screen bg-slate-100">
       <nav className="bg-[#1e3a5f] text-white">
@@ -32,6 +35,11 @@ export default async function MainLayout({
             <Link href="/dashboard" className="text-sm text-slate-200 hover:text-white whitespace-nowrap">
               Dashboard
             </Link>
+            {role === "admin" && (
+              <Link href="/nguoi-dung" className="text-sm text-slate-200 hover:text-white whitespace-nowrap">
+                Người dùng
+              </Link>
+            )}
           </div>
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <span className="text-xs text-slate-300 hidden sm:inline">{user.email}</span>

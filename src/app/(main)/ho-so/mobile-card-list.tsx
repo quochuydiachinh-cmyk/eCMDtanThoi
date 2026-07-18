@@ -15,11 +15,13 @@ const BADGE_CLS: Record<TrangThai, string> = {
 export default function MobileCardList({
   rows,
   customFields,
+  canEdit,
   onSave,
   onDelete,
 }: {
   rows: HoSo[];
   customFields: CustomFieldDef[];
+  canEdit: boolean;
   onSave: (row: HoSo) => Promise<boolean>;
   onDelete: (row: HoSo) => void;
 }) {
@@ -61,6 +63,7 @@ export default function MobileCardList({
         <EditRowSheet
           row={editing}
           customFields={customFields}
+          canEdit={canEdit}
           onClose={() => setEditing(null)}
           onSave={onSave}
           onDelete={onDelete}

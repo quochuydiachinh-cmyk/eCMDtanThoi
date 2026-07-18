@@ -49,11 +49,14 @@ Muốn xem trước kết quả parse mà không ghi vào Supabase: `DRY_RUN=1 n
 
 ### 1.5 Tạo tài khoản đăng nhập đầu tiên
 
-Không có trang đăng ký công khai — tạo tài khoản bằng script:
+Không có trang đăng ký công khai — tạo tài khoản quản trị (admin) đầu tiên bằng script:
 
 ```bash
-npx tsx scripts/create-user.ts ban@example.com "MatKhauManh123"
+npx tsx scripts/create-user.ts ban@example.com "MatKhauManh123" admin
 ```
+
+Từ tài khoản admin này, vào mục **Người dùng** trên web để tạo thêm tài khoản cho người khác
+với quyền "Chỉ xem" hoặc "Có thể sửa" (xem mục 3 bên dưới).
 
 ### 1.6 Chạy dev server
 
@@ -84,11 +87,27 @@ Mở [http://localhost:3000](http://localhost:3000) — sẽ tự chuyển tới
 - `src/app/(main)/dashboard` – thống kê: thẻ số liệu, 4 biểu đồ (theo thời gian, loại đất
   trước/sau, theo ấp), bộ lọc (năm/ấp/loại đất/tờ bản đồ/trạng thái/khoảng ngày), bảng
   kết quả lọc.
+- `src/app/(main)/nguoi-dung` – quản lý tài khoản (chỉ admin thấy/truy cập được): tạo tài
+  khoản mới với quyền "Chỉ xem" hoặc "Có thể sửa", đổi quyền, xoá tài khoản.
+- `src/app/api/users` – Route Handler dùng service role key để tạo/xoá tài khoản Supabase
+  Auth (không thể làm việc này từ client vì cần quyền admin của Supabase).
 - `src/proxy.ts` – bảo vệ toàn bộ route (trừ `/login`) bằng Supabase session.
 - `scripts/migrate.ts`, `scripts/import.ts`, `scripts/create-user.ts` – công cụ vận hành,
   không phải một phần của web app khi deploy.
 
-## 4. Ghi chú
+## 4. Phân quyền
+
+3 quyền lưu trong bảng `profiles` (cột `role`), áp dụng bằng Postgres RLS nên được chặn
+ở tầng database chứ không chỉ ẩn nút trên giao diện:
+
+- **admin**: toàn quyền, gồm cả tạo/xoá/đổi quyền tài khoản khác (trang "Người dùng").
+- **editor** ("Có thể sửa"): xem + sửa/thêm/xoá hồ sơ và cột tuỳ chỉnh, không quản lý được tài khoản.
+- **viewer** ("Chỉ xem"): chỉ xem/lọc/xuất Excel, mọi thao tác ghi bị RLS chặn.
+
+Tài khoản tạo đầu tiên (bước 1.5) tự động là admin. Từ đó tạo thêm tài khoản qua trang
+**Người dùng** trên web — không cần chạy script nữa.
+
+## 5. Ghi chú
 
 - Trạng thái hồ sơ (Đang xử lý / Đã trả / Trễ hạn) tính động từ `ngay_nhan`/`ngay_tra`,
   ngưỡng trễ hạn mặc định 20 ngày làm việc (`src/lib/status.ts`) — đây là giả định tạm,

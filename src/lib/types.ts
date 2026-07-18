@@ -42,3 +42,10 @@ export const TRANG_THAI_LABEL: Record<TrangThai, string> = {
   tre_han: "Trễ hạn",
   dang_xu_ly: "Đang xử lý",
 };
+
+export type Profile = {
+  id: string;
+  email: string;
+  role: import("./role").Role;
+  created_at: string;
+};

@@ -72,7 +72,7 @@ type Filters = {
 
 const EMPTY_FILTERS: Filters = { ap: "", loaiDat: "", trangThai: "", tbd: "", search: "" };
 
-export default function HoSoGrid() {
+export default function HoSoGrid({ canEdit }: { canEdit: boolean }) {
   const [selectedYear, setSelectedYear] = useState<number>(YEARS[0]);
   const [rows, setRows] = useState<HoSo[]>([]);
   const [customFields, setCustomFields] = useState<CustomFieldDef[]>([]);
@@ -431,8 +431,10 @@ export default function HoSoGrid() {
       },
     }));
 
-    return [...fixed, ...dynamic];
-  }, [customFields, handleDeleteRow]);
+    const all = [...fixed, ...dynamic];
+    if (canEdit) return all;
+    return all.filter((c) => c.colId !== "actions").map((c) => ({ ...c, editable: false }));
+  }, [customFields, handleDeleteRow, canEdit]);
 
   return (
     <div className="max-w-[1600px] mx-auto p-3 sm:p-6">
@@ -453,37 +455,45 @@ export default function HoSoGrid() {
           ))}
         </div>
         <div className="flex flex-wrap gap-2">
-          <button
-            onClick={handleAddRow}
-            className="text-xs font-semibold px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            + Thêm dòng
-          </button>
-          <button
-            onClick={() => setShowAddColumn(true)}
-            className="text-xs font-semibold px-3 py-2 rounded-md bg-slate-700 hover:bg-slate-800 text-white"
-          >
-            + Thêm cột
-          </button>
+          {canEdit && (
+            <>
+              <button
+                onClick={handleAddRow}
+                className="text-xs font-semibold px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                + Thêm dòng
+              </button>
+              <button
+                onClick={() => setShowAddColumn(true)}
+                className="text-xs font-semibold px-3 py-2 rounded-md bg-slate-700 hover:bg-slate-800 text-white"
+              >
+                + Thêm cột
+              </button>
+            </>
+          )}
           <button
             onClick={handleExport}
             className="text-xs font-semibold px-3 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white"
           >
             Xuất Excel
           </button>
-          <button
-            onClick={handleImportClick}
-            className="text-xs font-semibold px-3 py-2 rounded-md bg-amber-600 hover:bg-amber-700 text-white"
-          >
-            Nhập Excel
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".xlsx,.xls"
-            className="hidden"
-            onChange={handleImportFile}
-          />
+          {canEdit && (
+            <>
+              <button
+                onClick={handleImportClick}
+                className="text-xs font-semibold px-3 py-2 rounded-md bg-amber-600 hover:bg-amber-700 text-white"
+              >
+                Nhập Excel
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".xlsx,.xls"
+                className="hidden"
+                onChange={handleImportFile}
+              />
+            </>
+          )}
         </div>
       </div>
 
@@ -585,13 +595,14 @@ export default function HoSoGrid() {
         <MobileCardList
           rows={filteredRows}
           customFields={customFields}
+          canEdit={canEdit}
           onSave={handleUpdateRow}
           onDelete={handleDeleteRow}
         />
       </div>
 
       <AddColumnDialog
-        open={showAddColumn}
+        open={canEdit && showAddColumn}
         customFields={customFields}
         onClose={() => setShowAddColumn(false)}
         onCreated={(def) => setCustomFields((prev) => [...prev, def])}
