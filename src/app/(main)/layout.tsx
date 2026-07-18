@@ -27,20 +27,20 @@ export default async function MainLayout({
     <div className="min-h-screen bg-slate-100">
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             <Image
               src="/quoc-huy.png"
               alt="Quốc huy Việt Nam"
               width={112}
               height={112}
               priority
-              className="h-9 w-9 sm:h-14 sm:w-14 object-contain shrink-0"
+              className="h-11 w-11 sm:h-16 sm:w-16 object-contain shrink-0"
             />
-            <div className="min-w-0">
-              <h1 className="text-[#b91c1c] font-extrabold text-[13px] sm:text-lg leading-tight tracking-tight truncate">
+            <div className="min-w-0 flex flex-col items-center">
+              <h1 className="text-[#b91c1c] font-extrabold text-sm sm:text-xl leading-tight tracking-tight text-center truncate max-w-full">
                 ỦY BAN NHÂN DÂN XÃ TÂN THỚI
               </h1>
-              <p className="text-slate-500 text-[10px] sm:text-sm font-semibold uppercase tracking-wide truncate">
+              <p className="text-slate-500 text-xs sm:text-base font-semibold uppercase tracking-wide text-center truncate max-w-full">
                 Phòng Kinh Tế
               </p>
             </div>
