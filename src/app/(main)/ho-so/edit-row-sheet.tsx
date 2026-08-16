@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CustomFieldDef, HoSo, TRANG_THAI_LABEL } from "@/lib/types";
 import { tinhTrangThai } from "@/lib/status";
+import { normalizeAp } from "@/lib/ap";
 
 const inputCls =
   "w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
@@ -75,14 +76,14 @@ export default function EditRowSheet({
               onChange={(e) => setField("dia_chi_noi_o", e.target.value)}
             />
           </Field>
-          <Field label="Ấp">
-            <input className={inputCls} value={form.ap ?? ""} onChange={(e) => setField("ap", e.target.value)} />
-          </Field>
           <Field label="Địa chỉ thửa đất">
             <input
               className={inputCls}
               value={form.dia_chi_thua_dat ?? ""}
-              onChange={(e) => setField("dia_chi_thua_dat", e.target.value)}
+              onChange={(e) => {
+                setField("dia_chi_thua_dat", e.target.value);
+                setField("ap", normalizeAp(e.target.value));
+              }}
             />
           </Field>
           <div className="grid grid-cols-2 gap-3">

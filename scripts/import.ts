@@ -2,6 +2,7 @@ import { config } from "dotenv";
 import path from "node:path";
 import XLSX from "xlsx";
 import { createClient } from "@supabase/supabase-js";
+import { normalizeAp } from "../src/lib/ap";
 
 config({ path: path.join(process.cwd(), ".env.local") });
 
@@ -29,36 +30,6 @@ const SOURCES: SourceFile[] = [
   { path: path.join(SOURCE_DIR, "1. Danh sách CMĐ 2025.xls"), sheet: "TAN THOI", nam: 2025 },
   { path: path.join(SOURCE_DIR, "2. Danh sách CMĐ 6-2026.xls"), sheet: "Tân Thới", nam: 2026 },
 ];
-
-// ---------- Chuẩn hoá tên ấp ----------
-// Chỉ sửa các lỗi định dạng rõ ràng đã khảo sát trong 2 file nguồn: chữ dính
-// liền ("TânHương" -> "Tân Hương"), khoảng trắng thừa, và đuôi " xã ..." bị
-// dính vào tên ấp khi không có dấu phẩy. KHÔNG dùng khớp mờ bỏ dấu vì "Tân
-// Thành" và "Tân Thạnh" là 2 ấp khác nhau nhưng trùng nhau khi bỏ dấu.
-function normalizeAp(raw: string | undefined | null): string | null {
-  if (!raw) return null;
-  let s = raw.toString().trim();
-  if (!s) return null;
-  // chỉ lấy phần trước dấu phẩy đầu tiên (bỏ "xã Tân Thới" phía sau nếu có)
-  s = s.split(",")[0].trim();
-  const isKhuPho = /^khu\s*ph[oốồổỗộ]/i.test(s);
-  const isPhuong = /^(p\.|phường)\s*/i.test(s);
-  let name = s
-    .replace(/^ấp\s*/i, "")
-    .replace(/^khu\s*ph[oốồổỗộ]\s*/i, "")
-    .replace(/^(p\.|phường)\s*/i, "")
-    .trim();
-  // bỏ đuôi " xã ..." nếu dính liền không có dấu phẩy, vd "Tân Hiệp xã Tân Thới"
-  name = name.replace(/\s+x[aã]\s+.*$/i, "").trim();
-  // gộp nhiều khoảng trắng liên tiếp thành 1
-  name = name.replace(/\s+/g, " ").trim();
-  // tách chữ "Tân" dính liền với từ theo sau, vd "TânHương" -> "Tân Hương"
-  name = name.replace(/^Tân(?=\S)/, "Tân ");
-
-  if (isKhuPho) return `Khu phố ${name}`.trim();
-  if (isPhuong) return `P. ${name}`.trim();
-  return name || null;
-}
 
 // ---------- Chuẩn hoá diện tích (số kiểu VN: "538,1" hoặc "1.252,8") ----------
 function parseArea(val: unknown): number | null {

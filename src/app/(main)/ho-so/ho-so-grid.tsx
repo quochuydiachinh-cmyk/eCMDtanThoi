@@ -15,6 +15,7 @@ import { createClient } from "@/lib/supabase/client";
 import { CustomFieldDef, HoSo, TRANG_THAI_LABEL, TrangThai } from "@/lib/types";
 import { tinhTrangThai } from "@/lib/status";
 import { formatDateDisplay, parseDateInput } from "@/lib/dates";
+import { normalizeAp } from "@/lib/ap";
 import AddColumnDialog from "./add-column-dialog";
 import MobileCardList from "./mobile-card-list";
 
@@ -178,7 +179,15 @@ export default function HoSoGrid({ canEdit }: { canEdit: boolean }) {
       }
 
       (row as unknown as Record<string, unknown>)[field] = value;
-      persistCell(row.id, { [field]: value });
+      const payload: Record<string, unknown> = { [field]: value };
+
+      if (field === "dia_chi_thua_dat") {
+        const ap = normalizeAp(value as string | null);
+        row.ap = ap;
+        payload.ap = ap;
+      }
+
+      persistCell(row.id, payload);
     },
     [persistCell]
   );
@@ -380,8 +389,7 @@ export default function HoSoGrid({ canEdit }: { canEdit: boolean }) {
       { field: "stt", headerName: "STT", width: 70, editable: true, pinned: "left" },
       { field: "ho_ten", headerName: "Họ và tên", width: 170, editable: true, pinned: "left" },
       { field: "dia_chi_noi_o", headerName: "Địa chỉ nơi ở", width: 200, editable: true },
-      { field: "ap", headerName: "Ấp", width: 120, editable: true },
-      { field: "dia_chi_thua_dat", headerName: "Địa chỉ thửa đất", width: 200, editable: true },
+      { field: "dia_chi_thua_dat", headerName: "Địa chỉ thửa đất", width: 220, editable: true },
       { field: "to_ban_do", headerName: "TBĐ", width: 80, editable: true },
       { field: "thua_dat_truoc", headerName: "Thửa (trước)", width: 110, editable: true },
       { field: "loai_dat_truoc", headerName: "Loại đất (trước)", width: 120, editable: true },
