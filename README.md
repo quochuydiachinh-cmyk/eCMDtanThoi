@@ -78,6 +78,9 @@ Mở [http://localhost:3000](http://localhost:3000) — sẽ tự chuyển tới
    - `SUPABASE_SECRET_KEY`
 4. Deploy. Vercel tự build bằng `npm run build`.
 5. Sau khi có domain, đăng nhập bằng tài khoản đã tạo ở bước 1.5.
+6. (Tuỳ chọn, nên làm) Thêm biến môi trường `CRON_SECRET` (một chuỗi ngẫu nhiên bất kỳ) —
+   Vercel sẽ tự đính kèm giá trị này vào header khi gọi cron, giúp endpoint `/api/keepalive`
+   không bị người ngoài gọi tuỳ ý. Xem thêm mục 6 bên dưới.
 
 ## 3. Cấu trúc chính
 
@@ -107,7 +110,24 @@ Mở [http://localhost:3000](http://localhost:3000) — sẽ tự chuyển tới
 Tài khoản tạo đầu tiên (bước 1.5) tự động là admin. Từ đó tạo thêm tài khoản qua trang
 **Người dùng** trên web — không cần chạy script nữa.
 
-## 5. Ghi chú
+## 5. Chống Supabase tự pause
+
+Gói miễn phí (Free tier) của Supabase **tự động pause project** nếu không có hoạt động
+nào lên database trong 7 ngày (không thể tắt tính năng này ở gói miễn phí; khi bị pause,
+cả web lẫn đăng nhập đều báo lỗi "Failed to fetch"/không kết nối được).
+
+Đã thiết lập sẵn:
+- `src/app/api/keepalive/route.ts` — endpoint gọi 1 truy vấn nhẹ vào bảng `ho_so` để
+  "đánh thức"/giữ hoạt động cho project.
+- `vercel.json` — cấu hình **Vercel Cron** tự gọi endpoint trên **mỗi ngày lúc 03:00 UTC**,
+  chạy trên hạ tầng Vercel, không phụ thuộc máy tính hay phiên làm việc nào.
+
+Lưu ý: đây là giải pháp workaround miễn phí, **không đảm bảo tuyệt đối 100%** (Supabase có
+thể đổi chính sách, hoặc cron lỡ không chạy đúng lịch). Muốn đảm bảo chắc chắn không bao giờ
+bị pause, cách duy nhất do chính Supabase công bố là nâng cấp project lên gói **Pro** (~25
+USD/tháng) tại Supabase Dashboard → Project Settings → Billing.
+
+## 6. Ghi chú
 
 - Trạng thái hồ sơ (Đang xử lý / Đã trả / Trễ hạn) tính động từ `ngay_nhan`/`ngay_tra`,
   ngưỡng trễ hạn mặc định 20 ngày làm việc (`src/lib/status.ts`) — đây là giả định tạm,
