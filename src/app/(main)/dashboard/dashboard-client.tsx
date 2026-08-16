@@ -22,25 +22,30 @@ import { formatDateDisplay } from "@/lib/dates";
 
 const COLORS = {
   blue: "#2563eb",
-  green: "#10b981",
-  amber: "#f59e0b",
-  purple: "#8b5cf6",
-  red: "#ef4444",
-  teal: "#14b8a6",
-  pink: "#ec4899",
-  orange: "#f97316",
-  indigo: "#6366f1",
-  lime: "#84cc16",
-  cyan: "#06b6d4",
-  rose: "#f43f5e",
+  gold: "#b8862f",
+  teal: "#0e7c86",
+  emerald: "#0f9d63",
+  amber: "#d97706",
+  red: "#dc2626",
 };
-const PALETTE = Object.values(COLORS);
+const PALETTE = [
+  COLORS.blue,
+  COLORS.gold,
+  COLORS.teal,
+  COLORS.emerald,
+  COLORS.amber,
+  COLORS.red,
+  "#7aa6ff",
+  "#d7a655",
+  "#3fc2cd",
+  "#34d399",
+];
 
 const LOAI_TRUOC_COLOR: Record<string, string> = {
-  LUC: COLORS.green,
-  CLN: COLORS.amber,
+  LUC: COLORS.emerald,
+  CLN: COLORS.gold,
   HNK: COLORS.teal,
-  "CLN+ONT": COLORS.orange,
+  "CLN+ONT": COLORS.amber,
 };
 
 function fmtNum(n: number) {
@@ -173,50 +178,66 @@ export default function DashboardClient() {
       nts += r.dien_tich_sau_nts ?? 0;
     }
     return [
-      { name: "CLN", value: Math.round(cln), color: COLORS.amber },
+      { name: "CLN", value: Math.round(cln), color: COLORS.gold },
       { name: "ONT", value: Math.round(ont), color: COLORS.blue },
-      { name: "NTS", value: Math.round(nts), color: COLORS.purple },
+      { name: "NTS", value: Math.round(nts), color: COLORS.teal },
     ].filter((d) => d.value > 0);
   }, [filteredRows]);
 
+  const tyLeTra = cards.total > 0 ? Math.round((cards.daTra / cards.total) * 100) : 0;
+
   return (
     <div className="max-w-[1600px] mx-auto p-3 sm:p-6">
-      <div className="mb-4">
-        <h1 className="text-lg font-bold text-[#1e3a5f]">
-          📊 Dashboard Chuyển mục đích sử dụng đất – Xã Tân Thới
-        </h1>
-        <p className="text-xs text-slate-500 mt-1">
-          {loading ? "Đang tải dữ liệu..." : `${rows.length} hồ sơ trong hệ thống`}
-        </p>
+      <div className="mb-5 flex items-center gap-2.5">
+        <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#1e3a5f] text-white shrink-0">
+          <ChartTitleIcon />
+        </span>
+        <div>
+          <h1 className="text-lg font-bold text-[#1e3a5f] leading-tight">
+            Dashboard Chuyển mục đích sử dụng đất – Xã Tân Thới
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            {loading ? "Đang tải dữ liệu..." : `${rows.length} hồ sơ trong hệ thống`}
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5 mb-4">
-        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
-          <div className="text-[11px] text-slate-500 uppercase tracking-wide">Tổng hồ sơ</div>
-          <div className="text-2xl font-bold text-blue-600 mt-1">{cards.total}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">hồ sơ chuyển mục đích</div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-emerald-500">
-          <div className="text-[11px] text-slate-500 uppercase tracking-wide">Diện tích trước CMĐ</div>
-          <div className="text-2xl font-bold text-emerald-600 mt-1">{fmtNum(cards.dtTruoc)}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">m²</div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-amber-500">
-          <div className="text-[11px] text-slate-500 uppercase tracking-wide">Diện tích sau CMĐ</div>
-          <div className="text-2xl font-bold text-amber-600 mt-1">{fmtNum(cards.dtSau)}</div>
-          <div className="text-[11px] text-slate-400 mt-0.5">m²</div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-purple-500">
-          <div className="text-[11px] text-slate-500 uppercase tracking-wide">Đã trả kết quả</div>
-          <div className="text-2xl font-bold text-purple-600 mt-1">
-            {cards.daTra} / {cards.total}
-          </div>
-          <div className="text-[11px] text-slate-400 mt-0.5">hồ sơ</div>
-        </div>
+        <KpiCard
+          icon={<DocsIcon />}
+          color={COLORS.blue}
+          label="Tổng hồ sơ"
+          value={cards.total.toLocaleString("vi-VN")}
+          sub="hồ sơ chuyển mục đích"
+        />
+        <KpiCard
+          icon={<PlotIcon />}
+          color={COLORS.gold}
+          label="Diện tích trước CMĐ"
+          value={`${fmtNum(cards.dtTruoc)} m²`}
+          sub={cards.total > 0 ? `TB ${fmtNum(cards.dtTruoc / cards.total)} m²/hồ sơ` : "m²"}
+        />
+        <KpiCard
+          icon={<SwapIcon />}
+          color={COLORS.teal}
+          label="Diện tích sau CMĐ"
+          value={`${fmtNum(cards.dtSau)} m²`}
+          sub="CLN · ONT · NTS"
+        />
+        <KpiCard
+          icon={<CheckIcon />}
+          color={COLORS.emerald}
+          label="Đã trả kết quả"
+          value={`${cards.daTra} / ${cards.total}`}
+          sub={`${tyLeTra}% hồ sơ`}
+        />
       </div>
 
-      <div className="bg-white rounded-lg shadow p-4 mb-4">
-        <div className="text-xs font-semibold text-[#1e3a5f] mb-3">🔍 Bộ lọc</div>
+      <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-4 mb-4">
+        <div className="flex items-center gap-2 text-xs font-semibold text-[#1e3a5f] mb-3">
+          <FilterIcon />
+          Bộ lọc
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
           <FilterSelect
             label="Năm"
@@ -260,7 +281,7 @@ export default function DashboardClient() {
               type="date"
               value={filters.tuNgay}
               onChange={(e) => setFilters((f) => ({ ...f, tuNgay: e.target.value }))}
-              className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-xs"
+              className="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400"
             />
           </div>
           <div>
@@ -269,15 +290,16 @@ export default function DashboardClient() {
               type="date"
               value={filters.denNgay}
               onChange={(e) => setFilters((f) => ({ ...f, denNgay: e.target.value }))}
-              className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-xs"
+              className="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400"
             />
           </div>
         </div>
         <div className="mt-3">
           <button
             onClick={() => setFilters(EMPTY_FILTERS)}
-            className="text-xs px-3 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold"
+            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold transition"
           >
+            <ResetIcon />
             Xoá bộ lọc
           </button>
         </div>
@@ -292,9 +314,9 @@ export default function DashboardClient() {
               <YAxis tick={{ fontSize: 11 }} />
               <Tooltip formatter={(v) => `${fmtNum(Number(v))} m²`} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Bar dataKey="CLN" stackId="s" fill={COLORS.amber} />
-              <Bar dataKey="ONT" stackId="s" fill={COLORS.blue} />
-              <Bar dataKey="NTS" stackId="s" fill={COLORS.purple} />
+              <Bar dataKey="CLN" stackId="s" fill={COLORS.gold} radius={[3, 3, 0, 0]} />
+              <Bar dataKey="ONT" stackId="s" fill={COLORS.blue} radius={[3, 3, 0, 0]} />
+              <Bar dataKey="NTS" stackId="s" fill={COLORS.teal} radius={[3, 3, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartBox>
@@ -344,23 +366,28 @@ export default function DashboardClient() {
         </ChartBox>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-4">
         <div className="flex items-center justify-between mb-2">
           <div className="text-xs font-semibold text-[#1e3a5f]">Danh sách hồ sơ hợp lệ theo bộ lọc</div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-500">Hiển thị {filteredRows.length} hồ sơ</span>
+            <span className="text-xs text-slate-500 font-mono tabular-nums">Hiển thị {filteredRows.length} hồ sơ</span>
             <Link href="/ho-so" className="text-xs font-semibold text-blue-600 hover:underline">
               Mở trong Danh sách →
             </Link>
           </div>
         </div>
-        <div className="overflow-auto max-h-[360px]">
+        <div className="overflow-auto max-h-[360px] rounded-lg border border-slate-200">
           <table className="w-full text-xs border-collapse">
             <thead className="sticky top-0 bg-[#1e3a5f] text-white">
               <tr>
                 {["STT", "Họ và tên", "Ấp", "Loại đất trước", "DT trước (m²)", "Loại đất sau", "Ngày nhận", "Ngày trả", "Ghi chú"].map(
                   (h) => (
-                    <th key={h} className="px-2.5 py-2 text-left whitespace-nowrap">
+                    <th
+                      key={h}
+                      className={`px-2.5 py-2 text-left whitespace-nowrap font-semibold text-[10.5px] tracking-wide ${
+                        h === "STT" || h === "DT trước (m²)" ? "text-right" : ""
+                      }`}
+                    >
                       {h}
                     </th>
                   )
@@ -375,13 +402,20 @@ export default function DashboardClient() {
                   </td>
                 </tr>
               ) : (
-                filteredRows.map((r) => (
-                  <tr key={r.id} className="border-b border-slate-100 hover:bg-blue-50">
-                    <td className="px-2.5 py-1.5">{r.stt}</td>
-                    <td className="px-2.5 py-1.5">{r.ho_ten || "–"}</td>
+                filteredRows.map((r, i) => (
+                  <tr
+                    key={r.id}
+                    className={`border-b border-slate-100 hover:bg-blue-50 transition-colors ${
+                      i % 2 === 1 ? "bg-slate-50/60" : ""
+                    }`}
+                  >
+                    <td className="px-2.5 py-1.5 text-right font-mono tabular-nums text-slate-500">{r.stt}</td>
+                    <td className="px-2.5 py-1.5 font-medium text-slate-700">{r.ho_ten || "–"}</td>
                     <td className="px-2.5 py-1.5">{r.ap || "–"}</td>
                     <td className="px-2.5 py-1.5">{r.loai_dat_truoc || "–"}</td>
-                    <td className="px-2.5 py-1.5">{r.dien_tich_truoc != null ? fmtNum(r.dien_tich_truoc) : "–"}</td>
+                    <td className="px-2.5 py-1.5 text-right font-mono tabular-nums">
+                      {r.dien_tich_truoc != null ? fmtNum(r.dien_tich_truoc) : "–"}
+                    </td>
                     <td className="px-2.5 py-1.5">
                       {[
                         r.dien_tich_sau_cln ? "CLN" : null,
@@ -392,8 +426,18 @@ export default function DashboardClient() {
                         .join("+") || "–"}
                     </td>
                     <td className="px-2.5 py-1.5">{formatDateDisplay(r.ngay_nhan) || "–"}</td>
-                    <td className={`px-2.5 py-1.5 ${r.ngay_tra ? "text-emerald-600" : "text-red-600"}`}>
-                      {formatDateDisplay(r.ngay_tra) || "–"}
+                    <td className="px-2.5 py-1.5">
+                      {r.ngay_tra ? (
+                        <span className="inline-flex items-center gap-1.5 text-emerald-700">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                          {formatDateDisplay(r.ngay_tra)}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 text-red-600">
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
+                          Chưa trả
+                        </span>
+                      )}
                     </td>
                     <td className="px-2.5 py-1.5 text-slate-500 max-w-[180px] truncate">{r.ghi_chu || ""}</td>
                   </tr>
@@ -409,9 +453,39 @@ export default function DashboardClient() {
 
 function ChartBox({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-lg shadow p-4">
+    <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-4">
       <div className="text-xs font-semibold text-[#1e3a5f] mb-3">{title}</div>
       {children}
+    </div>
+  );
+}
+
+function KpiCard({
+  icon,
+  color,
+  label,
+  value,
+  sub,
+}: {
+  icon: React.ReactNode;
+  color: string;
+  label: string;
+  value: string;
+  sub: string;
+}) {
+  return (
+    <div
+      className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-4 border-l-[3px]"
+      style={{ borderLeftColor: color }}
+    >
+      <div className="flex items-center justify-between">
+        <div className="text-[11px] text-slate-500 uppercase tracking-wide font-medium">{label}</div>
+        <span className="shrink-0" style={{ color }}>
+          {icon}
+        </span>
+      </div>
+      <div className="text-xl sm:text-2xl font-bold text-slate-800 mt-1.5 font-mono tabular-nums">{value}</div>
+      <div className="text-[11px] text-slate-400 mt-0.5">{sub}</div>
     </div>
   );
 }
@@ -433,7 +507,7 @@ function FilterSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-xs"
+        className="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -442,5 +516,71 @@ function FilterSelect({
         ))}
       </select>
     </div>
+  );
+}
+
+const ICON_PROPS = {
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+};
+
+function ChartTitleIcon() {
+  return (
+    <svg {...ICON_PROPS} className="w-4.5 h-4.5">
+      <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+      <path d="M7 16l4-5 3 3 5-7" />
+    </svg>
+  );
+}
+function DocsIcon() {
+  return (
+    <svg {...ICON_PROPS} className="w-4 h-4">
+      <path d="M7 3h7l4 4v14H7z" />
+      <path d="M14 3v4h4" />
+    </svg>
+  );
+}
+function PlotIcon() {
+  return (
+    <svg {...ICON_PROPS} className="w-4 h-4">
+      <path d="M3 12l9-9 9 9" />
+      <path d="M5 10v10h14V10" />
+    </svg>
+  );
+}
+function SwapIcon() {
+  return (
+    <svg {...ICON_PROPS} className="w-4 h-4">
+      <path d="M17 2l4 4-4 4" />
+      <path d="M3 12v-2a4 4 0 0 1 4-4h14" />
+      <path d="M7 22l-4-4 4-4" />
+      <path d="M21 12v2a4 4 0 0 1-4 4H3" />
+    </svg>
+  );
+}
+function CheckIcon() {
+  return (
+    <svg {...ICON_PROPS} className="w-4 h-4">
+      <path d="M20 6L9 17l-5-5" />
+    </svg>
+  );
+}
+function FilterIcon() {
+  return (
+    <svg {...ICON_PROPS} className="w-3.5 h-3.5">
+      <path d="M22 3H2l8 9.46V19l4 2v-8.54z" />
+    </svg>
+  );
+}
+function ResetIcon() {
+  return (
+    <svg {...ICON_PROPS} className="w-3.5 h-3.5">
+      <path d="M3 12a9 9 0 1 0 3-6.7" />
+      <path d="M3 4v5h5" />
+    </svg>
   );
 }

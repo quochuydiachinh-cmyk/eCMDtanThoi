@@ -54,12 +54,38 @@ const TRANG_THAI_BADGE: Record<TrangThai, string> = {
   dang_xu_ly: "bg-amber-100 text-amber-700",
 };
 
+const TRANG_THAI_DOT: Record<TrangThai, string> = {
+  da_tra: "bg-emerald-500",
+  tre_han: "bg-red-500",
+  dang_xu_ly: "bg-amber-500",
+};
+
 function TrangThaiCellRenderer({ value }: { value: TrangThai | null }) {
   if (!value) return null;
   return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${TRANG_THAI_BADGE[value]}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${TRANG_THAI_BADGE[value]}`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${TRANG_THAI_DOT[value]}`} />
       {TRANG_THAI_LABEL[value]}
     </span>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-slate-400">
+      <circle cx="11" cy="11" r="7" />
+      <path d="M21 21l-4.35-4.35" />
+    </svg>
+  );
+}
+
+function FunnelIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-slate-400">
+      <path d="M22 3H2l8 9.46V19l4 2v-8.54z" />
+    </svg>
   );
 }
 
@@ -386,18 +412,49 @@ export default function HoSoGrid({ canEdit }: { canEdit: boolean }) {
             </button>
           ) : null,
       },
-      { field: "stt", headerName: "STT", width: 70, editable: true, pinned: "left" },
+      {
+        field: "stt",
+        headerName: "STT",
+        width: 70,
+        editable: true,
+        pinned: "left",
+        cellClass: "text-right font-mono tabular-nums",
+      },
       { field: "ho_ten", headerName: "Họ và tên", width: 170, editable: true, pinned: "left" },
       { field: "dia_chi_noi_o", headerName: "Địa chỉ nơi ở", width: 200, editable: true },
       { field: "dia_chi_thua_dat", headerName: "Địa chỉ thửa đất", width: 220, editable: true },
       { field: "to_ban_do", headerName: "TBĐ", width: 80, editable: true },
       { field: "thua_dat_truoc", headerName: "Thửa (trước)", width: 110, editable: true },
       { field: "loai_dat_truoc", headerName: "Loại đất (trước)", width: 120, editable: true },
-      { field: "dien_tich_truoc", headerName: "DT trước (m²)", width: 120, editable: true },
+      {
+        field: "dien_tich_truoc",
+        headerName: "DT trước (m²)",
+        width: 120,
+        editable: true,
+        cellClass: "text-right font-mono tabular-nums",
+      },
       { field: "thua_dat_sau", headerName: "Thửa (sau)", width: 100, editable: true },
-      { field: "dien_tich_sau_cln", headerName: "CLN sau (m²)", width: 110, editable: true },
-      { field: "dien_tich_sau_ont", headerName: "ONT sau (m²)", width: 110, editable: true },
-      { field: "dien_tich_sau_nts", headerName: "NTS sau (m²)", width: 110, editable: true },
+      {
+        field: "dien_tich_sau_cln",
+        headerName: "CLN sau (m²)",
+        width: 110,
+        editable: true,
+        cellClass: "text-right font-mono tabular-nums",
+      },
+      {
+        field: "dien_tich_sau_ont",
+        headerName: "ONT sau (m²)",
+        width: 110,
+        editable: true,
+        cellClass: "text-right font-mono tabular-nums",
+      },
+      {
+        field: "dien_tich_sau_nts",
+        headerName: "NTS sau (m²)",
+        width: 110,
+        editable: true,
+        cellClass: "text-right font-mono tabular-nums",
+      },
       {
         field: "ngay_nhan",
         headerName: "Ngày nhận",
@@ -505,85 +562,110 @@ export default function HoSoGrid({ canEdit }: { canEdit: boolean }) {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow p-4 mb-4">
+      <div className="bg-white rounded-xl border border-slate-200/70 shadow-sm p-4 mb-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           <div>
             <label className="block text-[11px] font-medium text-slate-500 mb-1">Ấp</label>
-            <select
-              value={filters.ap}
-              onChange={(e) => setFilters((f) => ({ ...f, ap: e.target.value }))}
-              className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-xs"
-            >
-              <option value="">-- Tất cả --</option>
-              {apOptions.map((a) => (
-                <option key={a} value={a}>
-                  {a}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2">
+                <FunnelIcon />
+              </span>
+              <select
+                value={filters.ap}
+                onChange={(e) => setFilters((f) => ({ ...f, ap: e.target.value }))}
+                className="w-full border border-slate-300 rounded-lg pl-8 pr-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400"
+              >
+                <option value="">-- Tất cả --</option>
+                {apOptions.map((a) => (
+                  <option key={a} value={a}>
+                    {a}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div>
             <label className="block text-[11px] font-medium text-slate-500 mb-1">Loại đất (trước)</label>
-            <select
-              value={filters.loaiDat}
-              onChange={(e) => setFilters((f) => ({ ...f, loaiDat: e.target.value }))}
-              className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-xs"
-            >
-              <option value="">-- Tất cả --</option>
-              {loaiDatOptions.map((l) => (
-                <option key={l} value={l}>
-                  {l}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2">
+                <FunnelIcon />
+              </span>
+              <select
+                value={filters.loaiDat}
+                onChange={(e) => setFilters((f) => ({ ...f, loaiDat: e.target.value }))}
+                className="w-full border border-slate-300 rounded-lg pl-8 pr-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400"
+              >
+                <option value="">-- Tất cả --</option>
+                {loaiDatOptions.map((l) => (
+                  <option key={l} value={l}>
+                    {l}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div>
             <label className="block text-[11px] font-medium text-slate-500 mb-1">Tờ bản đồ</label>
-            <select
-              value={filters.tbd}
-              onChange={(e) => setFilters((f) => ({ ...f, tbd: e.target.value }))}
-              className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-xs"
-            >
-              <option value="">-- Tất cả --</option>
-              {tbdOptions.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2">
+                <FunnelIcon />
+              </span>
+              <select
+                value={filters.tbd}
+                onChange={(e) => setFilters((f) => ({ ...f, tbd: e.target.value }))}
+                className="w-full border border-slate-300 rounded-lg pl-8 pr-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400"
+              >
+                <option value="">-- Tất cả --</option>
+                {tbdOptions.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div>
             <label className="block text-[11px] font-medium text-slate-500 mb-1">Trạng thái</label>
-            <select
-              value={filters.trangThai}
-              onChange={(e) => setFilters((f) => ({ ...f, trangThai: e.target.value }))}
-              className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-xs"
-            >
-              <option value="">-- Tất cả --</option>
-              {Object.entries(TRANG_THAI_LABEL).map(([k, v]) => (
-                <option key={k} value={k}>
-                  {v}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2">
+                <FunnelIcon />
+              </span>
+              <select
+                value={filters.trangThai}
+                onChange={(e) => setFilters((f) => ({ ...f, trangThai: e.target.value }))}
+                className="w-full border border-slate-300 rounded-lg pl-8 pr-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400"
+              >
+                <option value="">-- Tất cả --</option>
+                {Object.entries(TRANG_THAI_LABEL).map(([k, v]) => (
+                  <option key={k} value={k}>
+                    {v}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div>
             <label className="block text-[11px] font-medium text-slate-500 mb-1">Tìm kiếm</label>
-            <input
-              value={filters.search}
-              onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
-              placeholder="Họ tên, địa chỉ..."
-              className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-xs"
-            />
+            <div className="relative">
+              <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2">
+                <SearchIcon />
+              </span>
+              <input
+                value={filters.search}
+                onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
+                placeholder="Họ tên, địa chỉ..."
+                className="w-full border border-slate-300 rounded-lg pl-8 pr-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400"
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      <p className="text-xs text-slate-500 px-1 pb-2">
+      <p className="text-xs text-slate-500 px-1 pb-2 font-mono tabular-nums">
         {loading ? "Đang tải..." : `${filteredRows.length} / ${rows.length} hồ sơ`}
       </p>
 
-      <div className="hidden md:block bg-white rounded-xl shadow p-2">
+      <div className="hidden md:block bg-white rounded-xl border border-slate-200/70 shadow-sm p-2">
         <div style={{ height: "calc(100vh - 340px)", minHeight: 400 }}>
           <AgGridReact<HoSo>
             theme={gridTheme}
