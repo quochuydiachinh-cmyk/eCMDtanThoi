@@ -2,16 +2,15 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
- * Vercel Cron gọi endpoint này định kỳ để tạo hoạt động thật lên database,
+ * Được gọi định kỳ (Vercel Cron + GitHub Actions, xem vercel.json và
+ * .github/workflows/keepalive.yml) để tạo hoạt động thật lên database,
  * tránh Supabase free tier tự động pause project sau 7 ngày không hoạt động.
- * Xem lịch chạy trong vercel.json (mục "crons").
+ * Cố ý không yêu cầu xác thực: endpoint chỉ trả về số lượng hồ sơ (không có
+ * dữ liệu nhạy cảm), để bất kỳ dịch vụ ping miễn phí nào cũng gọi được mà
+ * không cần cấu hình secret — giảm nguy cơ 1 nguồn ping bị lỗi âm thầm làm
+ * project bị pause trở lại.
  */
-export async function GET(request: Request) {
-  const authHeader = request.headers.get("authorization");
-  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: "Không có quyền" }, { status: 401 });
-  }
-
+export async function GET() {
   const supabase = createAdminClient();
   const { count, error } = await supabase.from("ho_so").select("*", { count: "exact", head: true });
 

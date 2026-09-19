@@ -116,16 +116,20 @@ Gói miễn phí (Free tier) của Supabase **tự động pause project** nếu
 nào lên database trong 7 ngày (không thể tắt tính năng này ở gói miễn phí; khi bị pause,
 cả web lẫn đăng nhập đều báo lỗi "Failed to fetch"/không kết nối được).
 
-Đã thiết lập sẵn:
+Đã thiết lập sẵn **2 nguồn ping độc lập** (nếu 1 nguồn bị lỗi/không chạy thì vẫn còn nguồn kia):
 - `src/app/api/keepalive/route.ts` — endpoint gọi 1 truy vấn nhẹ vào bảng `ho_so` để
-  "đánh thức"/giữ hoạt động cho project.
-- `vercel.json` — cấu hình **Vercel Cron** tự gọi endpoint trên **mỗi ngày lúc 03:00 UTC**,
-  chạy trên hạ tầng Vercel, không phụ thuộc máy tính hay phiên làm việc nào.
+  "đánh thức"/giữ hoạt động cho project. Cố ý không yêu cầu xác thực (chỉ trả về số lượng
+  hồ sơ, không có dữ liệu nhạy cảm) để bất kỳ dịch vụ ping nào cũng gọi được.
+- `vercel.json` — **Vercel Cron** tự gọi endpoint mỗi ngày lúc 03:00 UTC (giới hạn tối thiểu
+  1 lần/ngày ở gói Hobby).
+- `.github/workflows/keepalive.yml` — **GitHub Actions** tự gọi endpoint mỗi 6 tiếng, chạy
+  trên hạ tầng GitHub, hoàn toàn độc lập với Vercel. Có thể vào tab **Actions** trên GitHub
+  repo để xem lịch sử chạy, hoặc bấm "Run workflow" để chạy thử ngay.
 
-Lưu ý: đây là giải pháp workaround miễn phí, **không đảm bảo tuyệt đối 100%** (Supabase có
-thể đổi chính sách, hoặc cron lỡ không chạy đúng lịch). Muốn đảm bảo chắc chắn không bao giờ
-bị pause, cách duy nhất do chính Supabase công bố là nâng cấp project lên gói **Pro** (~25
-USD/tháng) tại Supabase Dashboard → Project Settings → Billing.
+Lưu ý: đây vẫn là giải pháp workaround miễn phí, **không đảm bảo tuyệt đối 100%** (Supabase có
+thể đổi chính sách). Muốn đảm bảo chắc chắn không bao giờ bị pause, cách duy nhất do chính
+Supabase công bố là nâng cấp project lên gói **Pro** (~25 USD/tháng) tại Supabase Dashboard →
+Project Settings → Billing.
 
 ## 6. Ghi chú
 
